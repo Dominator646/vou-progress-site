@@ -3,45 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin</title>
+
+<script type="module" src="admin.js"></script>
 <style>
 body{
     background:#111;
     color:white;
-    font-family:sans-serif;
+    font-family:Arial;
     padding:40px;
 }
-
-input{
-    width:300px;
+input,select{
+    display:block;
     margin:10px 0;
+    width:300px;
     padding:10px;
+button{
+    padding:10px 20px;
 </style>
 </head>
 <body>
-<h1>Панель управления</h1>
-<input type="number" id="percent" placeholder="Процент"><br>
-<input type="text" id="title" placeholder="Текст"><br>
-<button onclick="save()">Сохранить</button>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-doc,
-setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig = {
-  apiKey: "AIzaSyCJcsgC32QfBE-iOL2Aarxy2VlASTtUwJI",
-  authDomain: "server-e07cf.firebaseapp.com",
-  projectId: "server-e07cf"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-window.save = async function(){
-    await setDoc(doc(db,"site","progress"),{
-        percent:Number(document.getElementById("percent").value),
-        title:document.getElementById("title").value
-    });
-    alert("Сохранено");
-</script>
+<h1>ADMIN PANEL</h1>
+<button id="login">
+    Login Google
+</button>
+<hr>
+<input type="number" id="percent" placeholder="Percent">
+<input type="text" id="title"
+placeholder="Title">
+<input type="number" id="online"
+placeholder="Online Count">
+<select id="status">
+    <option>ONLINE</option>
+    <option>OFFLINE</option>
+    <option>DEVELOPMENT</option>
+</select>
+<button id="save">
+    SAVE
 </body>
 </html>
