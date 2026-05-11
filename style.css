@@ -1,0 +1,146 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:black;
+    overflow:hidden;
+    font-family:Arial;
+    color:#00ffcc;
+    height:100vh;
+}
+
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-5;
+}
+
+.container{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:90%;
+    max-width:700px;
+    text-align:center;
+}
+
+.glitch{
+    font-size:42px;
+    text-shadow:
+    0 0 5px #00ffcc,
+    0 0 20px #00ffcc;
+    animation:glitch 1s infinite;
+}
+
+@keyframes glitch{
+    0%{transform:translate(0);}
+    20%{transform:translate(-2px,2px);}
+    40%{transform:translate(2px,-2px);}
+    60%{transform:translate(-1px,1px);}
+    80%{transform:translate(1px,-1px);}
+}
+
+.progressBox{
+    width:100%;
+    height:40px;
+    border:2px solid #00ffcc;
+    margin-top:40px;
+    overflow:hidden;
+    border-radius:20px;
+    box-shadow:0 0 20px #00ffcc;
+}
+
+.progressFill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#00ffcc,#00ff66);
+    transition:1s;
+    box-shadow:0 0 25px #00ffcc;
+}
+
+.percent{
+    margin-top:20px;
+    font-size:40px;
+}
+
+.status,
+.online{
+    margin-top:20px;
+    font-size:20px;
+}
+
+.almostReady{
+    margin-top:25px;
+    color:#00ff66;
+    display:none;
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    0%{opacity:0.4;}
+    50%{opacity:1;}
+    100%{opacity:0.4;}
+}
+
+.noise{
+    position:fixed;
+    inset:0;
+    background:url("https://i.imgur.com/8fK4h6S.png");
+    opacity:0.05;
+    pointer-events:none;
+}
+
+.vhs{
+    position:fixed;
+    inset:0;
+    background:
+    repeating-linear-gradient(
+        transparent 0px,
+        rgba(255,255,255,0.03) 2px,
+        transparent 4px
+    );
+    pointer-events:none;
+}
+
+#loading{
+    position:fixed;
+    inset:0;
+    background:black;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.loader{
+    width:120px;
+    height:120px;
+    border:4px solid #111;
+    border-top:4px solid #00ffcc;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg);}
+}
+
+@media(max-width:700px){
+
+    .glitch{
+        font-size:24px;
+    }
+
+    .percent{
+        font-size:28px;
+    }
+
+}
