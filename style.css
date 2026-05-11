@@ -5,142 +5,120 @@
 }
 
 body{
-    background:black;
+    background:#040404;
     overflow:hidden;
     font-family:Arial;
-    color:#00ffcc;
+    color:white;
     height:100vh;
-}
-
-canvas{
+.background{
     position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:-5;
-}
-
+    inset:0;
+    background:
+    radial-gradient(
+        circle at top left,
+        rgba(0,255,200,0.15),
+        transparent 30%
+    ),
+        circle at bottom right,
+        rgba(0,100,255,0.15),
+    linear-gradient(
+        135deg,
+        #050505,
+        #0a0a0a,
+        #050505
+    );
+    animation:bgMove 12s infinite alternate;
+@keyframes bgMove{
+    from{
+        transform:scale(1);
+    }
+    to{
+        transform:scale(1.1);
+.noise{
+    background-image:
+    url("https://i.imgur.com/8fK4h6S.png");
+    opacity:0.03;
+    pointer-events:none;
 .container{
     position:absolute;
     top:50%;
     left:50%;
-    transform:translate(-50%,-50%);
+    transform:
+    translate(-50%,-50%);
     width:90%;
     max-width:700px;
     text-align:center;
-}
-
-.glitch{
+.title{
     font-size:42px;
+    color:#00ffd0;
     text-shadow:
-    0 0 5px #00ffcc,
-    0 0 20px #00ffcc;
-    animation:glitch 1s infinite;
-}
-
+    0 0 10px #00ffd0,
+    0 0 25px #00ffd0;
+.glitch{
+    animation:glitch 2s infinite;
 @keyframes glitch{
-    0%{transform:translate(0);}
-    20%{transform:translate(-2px,2px);}
-    40%{transform:translate(2px,-2px);}
-    60%{transform:translate(-1px,1px);}
-    80%{transform:translate(1px,-1px);}
-}
-
+    0%{
+        transform:translate(0);
+    20%{
+        transform:translate(-1px,1px);
+    40%{
+        transform:translate(1px,-1px);
+    60%{
+        transform:translate(-2px,0);
+    80%{
+        transform:translate(2px,0);
 .progressBox{
     width:100%;
-    height:40px;
-    border:2px solid #00ffcc;
+    height:42px;
     margin-top:40px;
-    overflow:hidden;
     border-radius:20px;
-    box-shadow:0 0 20px #00ffcc;
-}
-
+    border:
+    2px solid #00ffd0;
+    box-shadow:
+    0 0 20px #00ffd0;
+    backdrop-filter:blur(10px);
 .progressFill{
     width:0%;
     height:100%;
-    background:linear-gradient(90deg,#00ffcc,#00ff66);
+        90deg,
+        #00ffd0,
+        #00ff88
     transition:1s;
-    box-shadow:0 0 25px #00ffcc;
-}
-
+    0 0 30px #00ffd0;
 .percent{
     margin-top:20px;
     font-size:40px;
-}
-
-.status,
-.online{
-    margin-top:20px;
-    font-size:20px;
-}
-
-.almostReady{
-    margin-top:25px;
-    color:#00ff66;
+    color:#ffffff;
+    0 0 15px white;
+.almost{
+    color:#00ff88;
     display:none;
     animation:pulse 1s infinite;
-}
-
 @keyframes pulse{
-    0%{opacity:0.4;}
-    50%{opacity:1;}
-    100%{opacity:0.4;}
-}
-
-.noise{
-    position:fixed;
-    inset:0;
-    background:url("https://i.imgur.com/8fK4h6S.png");
-    opacity:0.05;
-    pointer-events:none;
-}
-
-.vhs{
-    position:fixed;
-    inset:0;
-    background:
-    repeating-linear-gradient(
-        transparent 0px,
-        rgba(255,255,255,0.03) 2px,
-        transparent 4px
-    );
-    pointer-events:none;
-}
-
+        opacity:0.3;
+    50%{
+        opacity:1;
+    100%{
 #loading{
-    position:fixed;
-    inset:0;
     background:black;
-    z-index:999;
     display:flex;
-    flex-direction:column;
     justify-content:center;
     align-items:center;
-}
-
+    z-index:999;
 .loader{
-    width:120px;
-    height:120px;
-    border:4px solid #111;
-    border-top:4px solid #00ffcc;
+    width:90px;
+    height:90px;
     border-radius:50%;
-    animation:spin 1s linear infinite;
-}
-
+    border:3px solid #111;
+    border-top:
+    3px solid #00ffd0;
+    animation:
+    spin 1s linear infinite;
 @keyframes spin{
-    to{transform:rotate(360deg);}
-}
-
+        transform:rotate(360deg);
 @media(max-width:700px){
-
-    .glitch{
+    .title{
         font-size:24px;
-    }
-
     .percent{
         font-size:28px;
-    }
-
 }
