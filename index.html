@@ -102,40 +102,28 @@
     50% { color: #222; }
   }
   .loading { color: #2a2a2a; font-size: 9px; letter-spacing: 3px; }
-  .online {
+
+  /* Счётчик посетителей */
+  .visitors {
     position: fixed;
     top: 16px;
     left: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     font-size: 7px;
-    color: #444;
     letter-spacing: 2px;
+    line-height: 2;
+    text-align: left;
   }
-  .online-dot {
-    width: 6px;
-    height: 6px;
-    background: #4a4a4a;
-    image-rendering: pixelated;
-    animation: pulse 2s step-end infinite;
-  }
-  @keyframes pulse {
-    0%,100% { background: #5a5a5a; }
-    50% { background: #2a2a2a; }
-  }
-  .online-dot.active { background: #c8c8c8; animation: pulse-w 2s step-end infinite; }
-  @keyframes pulse-w {
-    0%,100% { background: #c8c8c8; }
-    50% { background: #888; }
-  }
+  .visitors-label { color: #333; }
+  .visitors-count { color: #666; }
 </style>
 </head>
 <body>
-<div class="online">
-  <div class="online-dot" id="online-dot"></div>
-  <span id="online-count">■ 0 онлайн</span>
+
+<div class="visitors">
+  <div class="visitors-label">■ посетителей</div>
+  <div class="visitors-count" id="visitor-count">...</div>
 </div>
+
 <div class="wrap">
   <div class="title" id="main-title">
     <span class="loading">загрузка...</span>
@@ -146,6 +134,7 @@
   </div>
   <div class="sub" id="sub">■ в разработке ■</div>
 </div>
+
 <script>
   const SUPABASE_URL = 'https://ttnwgyaoojpuvgdmwfea.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0bndneWFvb2pwdXZnZG13ZmVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTE2MDIsImV4cCI6MjA5NDA2NzYwMn0.TT9d50p3BVLFJ7LeUzsYdcpBO-7dXoV4fxkJnvlx-XU';
@@ -187,39 +176,50 @@
     }
   }
 
+  // ── Уникальные посетители ──────────────────────────────
+  // ID хранится в localStorage — один и тот же человек не считается дважды
+  async function trackVisitor() {
+    const KEY = 'vou_vid';
+    let vid = localStorage.getItem(KEY);
+    const isNew = !vid;
+
+    if (isNew) {
+      vid = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+      localStorage.setItem(KEY, vid);
+      // Записываем нового посетителя
+      await fetch(`${SUPABASE_URL}/rest/v1/visitors`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=ignore-duplicates'
+        },
+        body: JSON.stringify({ id: vid })
+      }).catch(() => {});
+    }
+
+    // Получаем общее количество
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/visitors?select=id`, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        Prefer: 'count=exact',
+        'Range-Unit': 'items',
+        Range: '0-0'
+      }
+    }).catch(() => null);
+
+    if (r) {
+      const range = r.headers.get('content-range'); // "0-0/1234"
+      const total = range ? parseInt(range.split('/')[1]) : '?';
+      document.getElementById('visitor-count').textContent = total;
+    }
+  }
+
   load();
   setInterval(load, 10000);
-
-  // Online counter via Supabase Realtime Presence
-  const uid = Math.random().toString(36).slice(2);
-  const wsUrl = SUPABASE_URL.replace('https://', 'wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
-  let ws, heartbeat;
-
-  function updateOnline(n) {
-    document.getElementById('online-count').textContent = '■ ' + n + ' онлайн';
-    const dot = document.getElementById('online-dot');
-    dot.classList.toggle('active', n > 0);
-  }
-
-  function connectPresence() {
-    ws = new WebSocket(wsUrl);
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ topic: 'realtime:online', event: 'phx_join', payload: { config: { presence: { key: uid } } }, ref: '1' }));
-      heartbeat = setInterval(() => {
-        if (ws.readyState === 1) ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: '0' }));
-      }, 20000);
-    };
-    ws.onmessage = e => {
-      const msg = JSON.parse(e.data);
-      if (msg.event === 'presence_state' || msg.event === 'presence_diff') {
-        const state = msg.event === 'presence_state' ? msg.payload : null;
-        if (state) updateOnline(Object.keys(state).length || 1);
-      }
-    };
-    ws.onclose = () => { clearInterval(heartbeat); setTimeout(connectPresence, 3000); };
-  }
-
-  connectPresence();
+  trackVisitor();
 </script>
 </body>
 </html>
