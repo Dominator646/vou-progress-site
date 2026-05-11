@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Admin</title>
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:sans-serif;
+    padding:40px;
+}
+
+input{
+    width:300px;
+    margin:10px 0;
+    padding:10px;
+</style>
+</head>
+<body>
+<h1>Панель управления</h1>
+<input type="number" id="percent" placeholder="Процент"><br>
+<input type="text" id="title" placeholder="Текст"><br>
+<button onclick="save()">Сохранить</button>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+getFirestore,
+doc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "ТВОЙ_API_KEY",
+  authDomain: "ТВОЙ_PROJECT.firebaseapp.com",
+  projectId: "ТВОЙ_PROJECT_ID"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+window.save = async function(){
+    await setDoc(doc(db,"site","progress"),{
+        percent:Number(document.getElementById("percent").value),
+        title:document.getElementById("title").value
+    });
+    alert("Сохранено");
+</script>
+</body>
+</html>
