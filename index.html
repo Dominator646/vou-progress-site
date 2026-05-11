@@ -23,35 +23,29 @@
     line-height: 2.2;
     margin-bottom: 36px;
     letter-spacing: 0.5px;
-  }
   .glitch { color: #fff; display: inline-block; position: relative; }
   .glitch::before, .glitch::after {
     content: attr(data-text);
     position: absolute;
     inset: 0;
-  }
   .glitch::before {
     color: #555;
     animation: gb 3s infinite;
     clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
-  }
   .glitch::after {
     color: #aaa;
     animation: ga 3s infinite;
     clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
-  }
   @keyframes gb {
     0%,80%,100% { transform: translate(0); opacity: 0; }
     82% { transform: translate(-2px,0); opacity: 1; }
     84% { transform: translate(2px,0); opacity: 1; }
     86% { opacity: 0; }
-  }
   @keyframes ga {
     0%,84%,100% { transform: translate(0); opacity: 0; }
     86% { transform: translate(2px,1px); opacity: 1; }
     88% { transform: translate(-1px,0); opacity: 1; }
     90% { opacity: 0; }
-  }
   .bar-outer {
     width: 100%;
     height: 28px;
@@ -59,52 +53,59 @@
     border: 2px solid #3a3a3a;
     position: relative;
     box-shadow: 2px 2px 0 #000, -1px -1px 0 #555 inset;
-  }
   .bar-inner {
     height: 100%;
     width: 0%;
     transition: width 1s steps(20, end);
-    position: relative;
     background-image: repeating-linear-gradient(
       90deg,
       #d4d4d4 0px, #d4d4d4 14px,
       #b0b0b0 14px, #b0b0b0 16px
     );
-  }
   .bar-inner::after {
     content: '';
-    position: absolute;
-    inset: 0;
     background-image:
       linear-gradient(#e8e8e8 2px, transparent 2px),
       linear-gradient(180deg, transparent calc(100% - 2px), #888 calc(100% - 2px));
-  }
   .bar-pct {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 9px;
     letter-spacing: 2px;
     color: #fff;
     mix-blend-mode: difference;
-  }
   .sub {
     margin-top: 14px;
     font-size: 7px;
     color: #444;
     letter-spacing: 3px;
     animation: blink 2s step-end infinite;
-  }
   @keyframes blink {
     0%,100% { color: #444; }
     50% { color: #222; }
-  }
   .loading { color: #2a2a2a; font-size: 9px; letter-spacing: 3px; }
+  .online {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    gap: 8px;
+  .online-dot {
+    width: 6px;
+    height: 6px;
+    background: #4a4a4a;
+    animation: pulse 2s step-end infinite;
+  @keyframes pulse {
+    0%,100% { background: #5a5a5a; }
+    50% { background: #2a2a2a; }
+  .online-dot.active { background: #c8c8c8; animation: pulse-w 2s step-end infinite; }
+  @keyframes pulse-w {
+    0%,100% { background: #c8c8c8; }
+    50% { background: #888; }
 </style>
 </head>
 <body>
+<div class="online">
+  <div class="online-dot" id="online-dot"></div>
+  <span id="online-count">■ 0 онлайн</span>
+</div>
 <div class="wrap">
   <div class="title" id="main-title">
     <span class="loading">загрузка...</span>
@@ -112,16 +113,13 @@
   <div class="bar-outer">
     <div class="bar-inner" id="bar-fill"></div>
     <div class="bar-pct" id="bar-pct">0%</div>
-  </div>
   <div class="sub" id="sub">■ в разработке ■</div>
-</div>
 <script>
   const SUPABASE_URL = 'https://ttnwgyaoojpuvgdmwfea.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0bndneWFvb2pwdXZnZG13ZmVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTE2MDIsImV4cCI6MjA5NDA2NzYwMn0.TT9d50p3BVLFJ7LeUzsYdcpBO-7dXoV4fxkJnvlx-XU';
 
   const MC = ['???','▓▒░','▪▫▬','╬╫╪','◆◇◈','█▓░','⬛⬜□'];
   const pick = () => MC[Math.floor(Math.random() * MC.length)];
-
   function renderTitle(text) {
     const html = text.replace(/\?\?\?/g, () => {
       const g = pick();
@@ -133,15 +131,11 @@
         const g = pick(); el.textContent = g; el.dataset.text = g;
       });
     }, 2800);
-  }
-
   function setBar(v) {
     const c = Math.max(0, Math.min(100, v));
     document.getElementById('bar-fill').style.width = c + '%';
     document.getElementById('bar-pct').textContent = c + '%';
     document.getElementById('sub').textContent = c >= 100 ? '■ готово ■' : '■ в разработке ■';
-  }
-
   async function load() {
     try {
       const r = await fetch(
@@ -154,10 +148,32 @@
       renderTitle('Прогресс создания сервера Vou???');
       setBar(42);
     }
-  }
-
   load();
   setInterval(load, 10000);
+  // Online counter via Supabase Realtime Presence
+  const uid = Math.random().toString(36).slice(2);
+  const wsUrl = SUPABASE_URL.replace('https://', 'wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
+  let ws, heartbeat;
+  function updateOnline(n) {
+    document.getElementById('online-count').textContent = '■ ' + n + ' онлайн';
+    const dot = document.getElementById('online-dot');
+    dot.classList.toggle('active', n > 0);
+  function connectPresence() {
+    ws = new WebSocket(wsUrl);
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ topic: 'realtime:online', event: 'phx_join', payload: { config: { presence: { key: uid } } }, ref: '1' }));
+      heartbeat = setInterval(() => {
+        if (ws.readyState === 1) ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: '0' }));
+      }, 20000);
+    };
+    ws.onmessage = e => {
+      const msg = JSON.parse(e.data);
+      if (msg.event === 'presence_state' || msg.event === 'presence_diff') {
+        const state = msg.event === 'presence_state' ? msg.payload : null;
+        if (state) updateOnline(Object.keys(state).length || 1);
+      }
+    ws.onclose = () => { clearInterval(heartbeat); setTimeout(connectPresence, 3000); };
+  connectPresence();
 </script>
 </body>
 </html>
