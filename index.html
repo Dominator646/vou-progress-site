@@ -1,38 +1,32 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Vou Progress</title>
 
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+<title>Vou Progress</title>
 <link rel="stylesheet" href="style.css">
 <script type="module" src="app.js"></script>
-<script src="matrix.js"></script>
 </head>
 <body>
-<canvas id="matrix"></canvas>
+<div class="background"></div>
 <div class="noise"></div>
-<div class="vhs"></div>
 <div id="loading">
     <div class="loader"></div>
-    <p>LOADING SYSTEM...</p>
 </div>
 <div class="container">
-    <div class="glitch" id="title">
-        Прогресс создания сервера Vou▒▒▒
+    <div class="title glitch" id="title">
+        Загрузка...
     </div>
-    <div class="status">
-        STATUS:
-        <span id="serverStatus">ONLINE</span>
-    <div class="online">
-        ONLINE:
-        <span id="onlineCount">0</span>
     <div class="progressBox">
-        <div class="progressFill" id="fill"></div>
-    <div class="percent" id="percent">
+        <div class="progressFill"
+        id="fill"></div>
+    <div class="percent"
+    id="percent">
         0%
-    <div class="almostReady" id="almostReady">
-        SERVER ALMOST READY...
-<audio id="clickSound" src="sounds/click.mp3"></audio>
+    <div class="almost"
+    id="almost">
+        СЕРВЕР СКОРО БУДЕТ ГОТОВ!
 </body>
 </html>
