@@ -2,117 +2,37 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Vou Progress</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
-<style>
-body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#050505;
-    overflow:hidden;
-    font-family:'Orbitron',sans-serif;
-    color:white;
-}
-
-.background{
-    position:absolute;
-    width:100%;
-    height:100%;
-    background:
-    radial-gradient(circle at center,#111 0%,#050505 70%);
-    filter:blur(2px);
-}
-
-.container{
-    z-index:2;
-    text-align:center;
-    width:600px;
-}
-
-.title{
-    font-size:32px;
-    margin-bottom:25px;
-    color:#00ffe5;
-    text-shadow:0 0 15px #00ffe5;
-}
-
-.bar{
-    width:100%;
-    height:35px;
-    border:2px solid #00ffe5;
-    border-radius:15px;
-    overflow:hidden;
-    box-shadow:0 0 25px #00ffe5;
-}
-
-.fill{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,#00ffe5,#00ff88);
-    transition:0.5s;
-    box-shadow:0 0 20px #00ffe5;
-}
-
-.percent{
-    margin-top:18px;
-    font-size:24px;
-    color:#00ff88;
-    text-shadow:0 0 10px #00ff88;
-}
-</style>
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+<script src="matrix.js"></script>
 </head>
 <body>
-
-<div class="background"></div>
-
+<canvas id="matrix"></canvas>
+<div class="noise"></div>
+<div class="vhs"></div>
+<div id="loading">
+    <div class="loader"></div>
+    <p>LOADING SYSTEM...</p>
+</div>
 <div class="container">
-    <div class="title" id="title">
+    <div class="glitch" id="title">
         Прогресс создания сервера Vou▒▒▒
     </div>
-
-    <div class="bar">
-        <div class="fill" id="fill"></div>
-    </div>
-
-    <div class="percent" id="percent">0%</div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-getFirestore,
-doc,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCJcsgC32QfBE-iOL2Aarxy2VlASTtUwJI",
-  authDomain: "server-e07cf.firebaseapp.com",
-  projectId: "server-e07cf"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const fill = document.getElementById("fill");
-const percent = document.getElementById("percent");
-const title = document.getElementById("title");
-
-onSnapshot(doc(db, "site", "progress"), (docSnap) => {
-    const data = docSnap.data();
-
-    fill.style.width = data.percent + "%";
-    percent.innerText = data.percent + "%";
-    title.innerText = data.title;
-});
-</script>
-
+    <div class="status">
+        STATUS:
+        <span id="serverStatus">ONLINE</span>
+    <div class="online">
+        ONLINE:
+        <span id="onlineCount">0</span>
+    <div class="progressBox">
+        <div class="progressFill" id="fill"></div>
+    <div class="percent" id="percent">
+        0%
+    <div class="almostReady" id="almostReady">
+        SERVER ALMOST READY...
+<audio id="clickSound" src="sounds/click.mp3"></audio>
 </body>
 </html>
