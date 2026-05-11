@@ -1,131 +1,370 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vou Project | Progress</title>
-    <!-- Подключаем библиотеку Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --neon-color: #00f2ff;
-            --bg-color: #050505;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vou Server Progress</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap');
 
-        body {
-            background-color: var(--bg-color);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
-        .container {
-            text-align: center;
-            z-index: 1;
-        h1 {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
-            text-shadow: 0 0 10px var(--neon-color), 0 0 20px var(--neon-color);
-            margin-bottom: 40px;
-            letter-spacing: 2px;
-        /* Эффект Minecraft Glitch */
-        .glitch {
-            display: inline-block;
-            font-family: 'Courier New', Courier, monospace;
-            color: var(--neon-color);
-            filter: drop-shadow(0 0 5px var(--neon-color));
-        /* Контейнер шкалы */
-        .progress-wrapper {
-            position: relative;
-            width: 80vw;
-            max-width: 500px;
-        .progress-container {
-            height: 24px;
-            background: #111;
-            border-radius: 12px;
-            border: 2px solid var(--neon-color);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3), inset 0 0 10px rgba(0, 242, 255, 0.1);
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #0077ff, var(--neon-color));
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 20px var(--neon-color);
-        #percent-text {
-            margin-top: 20px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px var(--neon-color);
-        /* Задний фон для атмосферы */
-        .bg-glow {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: var(--neon-color);
-            filter: blur(150px);
-            opacity: 0.1;
-            border-radius: 50%;
-            z-index: 0;
-    </style>
+  :root {
+    --neon-green: #39ff14;
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff00c8;
+    --neon-yellow: #fff01f;
+    --bg: #050a05;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Сетка на фоне */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(57,255,20,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57,255,20,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Сканлайны */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .container {
+    position: relative;
+    z-index: 5;
+    width: 90%;
+    max-width: 700px;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  /* Заголовок */
+  .title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(13px, 2.5vw, 20px);
+    color: var(--neon-green);
+    text-shadow:
+      0 0 7px var(--neon-green),
+      0 0 21px var(--neon-green),
+      0 0 42px var(--neon-green);
+    margin-bottom: 50px;
+    line-height: 1.8;
+    letter-spacing: 1px;
+    animation: flicker 4s infinite;
+  }
+
+  /* Глитч-часть */
+  .glitch-part {
+    display: inline-block;
+    color: var(--neon-pink);
+    text-shadow:
+      0 0 7px var(--neon-pink),
+      0 0 21px var(--neon-pink),
+      0 0 42px var(--neon-pink);
+    position: relative;
+    animation: glitch 2.5s infinite;
+  }
+
+  @keyframes glitch {
+    0%, 85%, 100% {
+      transform: translate(0);
+      color: var(--neon-pink);
+      text-shadow: 0 0 7px var(--neon-pink), 0 0 21px var(--neon-pink);
+      clip-path: none;
+    }
+    86% {
+      transform: translate(-3px, 1px);
+      color: var(--neon-cyan);
+      text-shadow: 3px 0 var(--neon-pink), -3px 0 var(--neon-cyan);
+    }
+    88% {
+      transform: translate(3px, -1px);
+      color: var(--neon-yellow);
+      text-shadow: -3px 0 var(--neon-pink), 3px 0 var(--neon-cyan);
+    }
+    90% {
+      transform: translate(-2px, 2px) skewX(5deg);
+      color: var(--neon-pink);
+    }
+    92% {
+      transform: translate(0) skewX(-3deg);
+      color: #fff;
+      text-shadow: 0 0 20px #fff;
+    }
+    94% {
+      transform: translate(2px, -2px);
+      color: var(--neon-cyan);
+    }
+    96% {
+      transform: translate(-1px, 1px);
+      color: var(--neon-pink);
+    }
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 1; }
+  }
+
+  /* Шкала */
+  .bar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 44px;
+    border: 2px solid var(--neon-green);
+    border-radius: 3px;
+    background: rgba(0,0,0,0.6);
+    box-shadow:
+      0 0 8px var(--neon-green),
+      0 0 20px rgba(57,255,20,0.3),
+      inset 0 0 10px rgba(0,0,0,0.8);
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(
+      90deg,
+      #39ff14 0%,
+      #00f5ff 50%,
+      #39ff14 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+    box-shadow:
+      0 0 10px var(--neon-green),
+      0 0 25px var(--neon-green),
+      inset 0 0 15px rgba(255,255,255,0.2);
+    transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+  }
+
+  /* Minecraft-пиксельные "блоки" на шкале */
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 18px,
+      rgba(0,0,0,0.25) 18px,
+      rgba(0,0,0,0.25) 20px
+    );
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: 0% 0; }
+  }
+
+  /* Процент внутри */
+  .bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 0 6px #000, 0 2px 0 rgba(0,0,0,0.8);
+    letter-spacing: 2px;
+    z-index: 2;
+    mix-blend-mode: difference;
+  }
+
+  /* Уголки декоративные */
+  .bar-corner {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: var(--neon-cyan);
+    border-style: solid;
+  }
+  .bar-corner.tl { top: -3px; left: -3px; border-width: 2px 0 0 2px; }
+  .bar-corner.tr { top: -3px; right: -3px; border-width: 2px 2px 0 0; }
+  .bar-corner.bl { bottom: -3px; left: -3px; border-width: 0 0 2px 2px; }
+  .bar-corner.br { bottom: -3px; right: -3px; border-width: 0 2px 2px 0; }
+
+  /* Нижний текст статуса */
+  .status {
+    margin-top: 24px;
+    font-size: 11px;
+    color: rgba(57,255,20,0.5);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: blink 1.5s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.1; }
+  }
+
+  /* Частицы */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--neon-green);
+    border-radius: 0; /* квадрат — майнкрафт */
+    animation: float linear infinite;
+    opacity: 0;
+  }
+  @keyframes float {
+    0%   { transform: translateY(100vh) translateX(0);  opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(30px); opacity: 0; }
+  }
+
+  /* Загрузка */
+  .loading {
+    color: rgba(57,255,20,0.4);
+    font-size: 11px;
+    letter-spacing: 4px;
+    animation: blink 1s step-end infinite;
+  }
+</style>
 </head>
 <body>
-    <div class="bg-glow"></div>
-    <div class="container">
-        <h1>Прогресс создания сервера Vou<span class="glitch" id="glitch-text">???</span></h1>
-        
-        <div class="progress-wrapper">
-            <div class="progress-container">
-                <div id="progress-bar"></div>
-            </div>
-        </div>
-        <div id="percent-text">0%</div>
+
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="title" id="main-title">
+    <span class="loading">ЗАГРУЗКА...</span>
+  </div>
+
+  <div style="position:relative; padding: 6px;">
+    <div class="bar-corner tl"></div>
+    <div class="bar-corner tr"></div>
+    <div class="bar-corner bl"></div>
+    <div class="bar-corner br"></div>
+    <div class="bar-wrapper">
+      <div class="bar-fill" id="bar-fill"></div>
+      <div class="bar-label" id="bar-label">0%</div>
     </div>
-    <script>
-        // 1. Настройки (ЗАМЕНИ НА СВОИ ИЗ SUPABASE)
-        const SUPABASE_URL = 'sb_publishable_mdFgb8jLvqq_EWASh7koxw_dftx3lfd';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0bndneWFvb2pwdXZnZG13ZmVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTE2MDIsImV4cCI6MjA5NDA2NzYwMn0.TT9d50p3BVLFJ7LeUzsYdcpBO-7dXoV4fxkJnvlx-XU';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        // 2. Логика Minecraft Glitch
-        const glitchElement = document.getElementById('glitch-text');
-        const chars = "¡¢£¤¥¦§KkABCDEF0123456789";
-        setInterval(() => {
-            let result = '';
-            for (let i = 0; i < 3; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            glitchElement.innerText = result;
-        }, 80);
-        // 3. Работа с данными
-        const progressBar = document.getElementById('progress-bar');
-        const percentText = document.getElementById('percent-text');
-        function updateUI(value) {
-            const safeValue = Math.min(Math.max(value, 0), 100); // Ограничение 0-100
-            progressBar.style.width = safeValue + '%';
-            percentText.innerText = safeValue + '%';
-        async function fetchInitialProgress() {
-            const { data, error } = await supabase
-                .from('settings')
-                .select('value')
-                .eq('key', 'progress')
-                .single();
-            if (data) updateUI(data.value);
-            if (error) console.error('Ошибка загрузки:', error);
-        // Подписка на Realtime обновления
-        supabase
-            .channel('schema-db-changes')
-            .on('postgres_changes', 
-                { event: 'UPDATE', schema: 'public', table: 'settings' }, 
-                (payload) => {
-                    if (payload.new.key === 'progress') {
-                        updateUI(payload.new.value);
-                    }
-                }
-            )
-            .subscribe();
-        fetchInitialProgress();
-    </script>
+  </div>
+
+  <div class="status" id="status-text">█ СИНХРОНИЗАЦИЯ... █</div>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════
+  //  ВСТАВЬ СЮДА СВОИ КЛЮЧИ ИЗ SUPABASE
+  //  Settings → API → Project URL и anon key
+  // ══════════════════════════════════════════════
+  const SUPABASE_URL  = 'https://ttnwgyaoojpuvgdmwfea.supabase.co';
+  const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0bndneWFvb2pwdXZnZG13ZmVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTE2MDIsImV4cCI6MjA5NDA2NzYwMn0.TT9d50p3BVLFJ7LeUzsYdcpBO-7dXoV4fxkJnvlx-XU';
+  // ══════════════════════════════════════════════
+
+  // Глитч-символы в стиле Майнкрафт
+  const GLITCH_CHARS = ['???', '▓▒░', '█▓▒', '╔╗╚', '◆◇◈', '⬛⬜', '▪▫▬', '≈≋∿', '꧁꧂', '⚔️🗡️🛡️'];
+
+  function randomGlitch() {
+    return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+  }
+
+  function renderTitle(text) {
+    // Заменяем ??? на глитч-спан
+    const escaped = text.replace(/\?\?\?/g, `<span class="glitch-part">${randomGlitch()}</span>`);
+    document.getElementById('main-title').innerHTML = escaped;
+
+    // Периодически обновляем глитч-символы
+    setInterval(() => {
+      document.querySelectorAll('.glitch-part').forEach(el => {
+        el.textContent = randomGlitch();
+      });
+    }, 2400);
+  }
+
+  function setProgress(value) {
+    const clamped = Math.max(0, Math.min(100, value));
+    document.getElementById('bar-fill').style.width = clamped + '%';
+    document.getElementById('bar-label').textContent = clamped + '%';
+    document.getElementById('status-text').textContent =
+      clamped < 100
+        ? '█ В РАЗРАБОТКЕ █'
+        : '✔ СЕРВЕР ГОТОВ ✔';
+  }
+
+  async function loadData() {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/progress?id=eq.1&select=value,title`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      );
+      const data = await res.json();
+      if (data && data[0]) {
+        renderTitle(data[0].title);
+        setProgress(data[0].value);
+      }
+    } catch(e) {
+      // Если ключи не вставлены — показываем демо
+      renderTitle('Прогресс создания сервера Vou???');
+      setProgress(42);
+      document.getElementById('status-text').textContent = '⚠ ВСТАВЬ КЛЮЧИ SUPABASE ⚠';
+    }
+  }
+
+  // Частицы
+  const pc = document.getElementById('particles');
+  const colors = ['#39ff14','#00f5ff','#ff00c8','#fff01f'];
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (6 + Math.random() * 12) + 's';
+    p.style.animationDelay = (-Math.random() * 15) + 's';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = p.style.height = (Math.random() > 0.5 ? 3 : 2) + 'px';
+    pc.appendChild(p);
+  }
+
+  loadData();
+  // Обновление каждые 10 секунд (реалтайм без вебсокетов)
+  setInterval(loadData, 10000);
+</script>
 </body>
 </html>
